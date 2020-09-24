@@ -8,7 +8,7 @@ ENV LANG C.UTF-8
 # Set the WILDFLY_VERSION env variable
 ENV WILDFLY_VERSION 20.0.1.Final
 ENV WILDFLY_SHA1 95366b4a0c8f2e6e74e3e4000a98371046c83eeb
-ENV JBOSS_HOME /opt/jboss/wildfly
+ENV JBOSS_HOME=${HOME}/wildfly
 
 # Switch back to root
 USER root
@@ -21,8 +21,9 @@ RUN cd $HOME \
     && tar xf wildfly-$WILDFLY_VERSION.tar.gz \
     && mv $HOME/wildfly-$WILDFLY_VERSION $JBOSS_HOME \
     && rm wildfly-$WILDFLY_VERSION.tar.gz \
-    && chown -R jboss:0 ${JBOSS_HOME} \
-    && chmod -R g+rw ${JBOSS_HOME}
+    && chown -R jboss:0 ${HOME} \
+    && chmod -R g+rw ${HOME}
+# Changing the permissions on $HOME instead of the sub folder $JBOSS_HOME to fix the error "Unable to create index directory: target/lucenefiles"
 
 # Ensure signals are forwarded to the JVM process correctly for graceful shutdown
 ENV LAUNCH_JBOSS_IN_BACKGROUND true
