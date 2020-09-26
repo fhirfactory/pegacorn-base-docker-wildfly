@@ -1,4 +1,4 @@
-FROM aethercontainerregistry.azurecr.io/pegacorn-base-docker-java:1.0.0-snapshot
+FROM fhirfactory/pegacorn-base-docker-java:1.0.0
 
 # Default to UTF-8 file.encoding from https://github.com/woahbase/alpine-wildfly/blob/master/Dockerfile_x86_64
 ENV LANG C.UTF-8
