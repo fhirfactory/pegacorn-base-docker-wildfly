@@ -49,3 +49,10 @@ EXPOSE 8080
 RUN mv $JBOSS_HOME/standalone/configuration/standalone.xml $JBOSS_HOME/standalone/configuration/standalone.xml.orig && \
     cp $JBOSS_HOME/standalone/configuration/standalone-full-ha.xml $JBOSS_HOME/standalone/configuration/standalone.xml
 
+# Copy and run cli to modify the standalone.xml configuration.
+COPY cli/ssl-configuration.cli $JBOSS_HOME/bin/ssl-configuration.cli
+
+# After running each command the content of the "$JBOSS_HOME/standalone/configuration/standalone_xml_history/current" directory
+# needs to be deleted as each steps expects it to be empty.  Maybe there is another way??
+RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/ssl-configuration.cli && \
+    rm -rf $JBOSS_HOME/standalone/configuration/standalone_xml_history/current/*
