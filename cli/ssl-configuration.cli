@@ -11,9 +11,9 @@ batch
 
 # From https://stackoverflow.com/questions/56272061/configure-http-headers-in-wildfly-10
 # and https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html
-/subsystem=undertow/configuration=filter/response-header=Content-Security-Policy:add(header-name=Content-Security-Policy,header-value="default-src 'self'")
+#/subsystem=undertow/configuration=filter/response-header=Content-Security-Policy:add(header-name=Content-Security-Policy,header-value="default-src 'self'")
 /subsystem=undertow/configuration=filter/response-header=x-frame-options:add(header-name=X-Frame-Options,header-value="SAMEORIGIN")
-/subsystem=undertow/server=default-server/host=default-host/filter-ref=Content-Security-Policy/:add()
+#/subsystem=undertow/server=default-server/host=default-host/filter-ref=Content-Security-Policy/:add()
 /subsystem=undertow/server=default-server/host=default-host/filter-ref=x-frame-options/:add()
 			
 /core-service=management/security-realm=ApplicationRealm:remove()
