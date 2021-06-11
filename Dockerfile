@@ -6,8 +6,8 @@ ENV LANG C.UTF-8
 # START equivalent of https://github.com/jboss-dockerfiles/wildfly/blob/20.0.1.Final/Dockerfile
 
 # Set the WILDFLY_VERSION env variable
-ENV WILDFLY_VERSION 20.0.1.Final
-ENV WILDFLY_SHA1 95366b4a0c8f2e6e74e3e4000a98371046c83eeb
+ENV WILDFLY_VERSION 22.0.1.Final
+ENV WILDFLY_SHA1 624bd3ca7e66accf5494028f5ebabcb119339803
 ENV JBOSS_HOME=${HOME}/wildfly
 
 # Switch back to root
