@@ -56,3 +56,20 @@ COPY cli/ssl-configuration.cli $JBOSS_HOME/bin/ssl-configuration.cli
 # needs to be deleted as each steps expects it to be empty.  Maybe there is another way??
 RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/ssl-configuration.cli && \
     rm -rf $JBOSS_HOME/standalone/configuration/standalone_xml_history/current/*
+
+# Remove vulnerable jars that exist only in Wildfly
+# These jars are not in the Aether projects
+RUN rm $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.3.jar
+RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/sshd/main/sshd-core-2.6.0.jar
+RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/santuario/xmlsec/main/xmlsec-2.1.6.jar
+RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/thrift/main/libthrift-0.13.0.jar
+RUN rm $JBOSS_HOME/modules/system/layers/base/org/picketlink/common/main/picketlink-common-2.5.5.SP12-redhat-00009.jar
+RUN rm $JBOSS_HOME/modules/system/layers/base/org/jsoup/main/jsoup-1.8.3.jar
+
+# Copy jar versions that are not vulnerable as @ 14/04/2022
+COPY jar_files/jackson-databind-2.12.6.1.jar $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.6.1.jar
+COPY jar_files/sshd-core-2.7.0.jar $JBOSS_HOME/modules/system/layers/base/org/apache/sshd/main/sshd-core-2.7.0.jar
+COPY jar_files/xmlsec-2.2.3.jar $JBOSS_HOME/modules/system/layers/base/org/apache/santuario/xmlsec/main/xmlsec-2.2.3.jar
+COPY jar_files/libthrift-0.14.0.jar $JBOSS_HOME/modules/system/layers/base/org/apache/thrift/main/libthrift-0.14.0.jar
+COPY jar_files/picketlink-common-2.6.1.Final.jar $JBOSS_HOME/modules/system/layers/base/org/picketlink/common/main/picketlink-common-2.6.1.Final.jar
+COPY jar_files/jsoup-1.14.3.jar $JBOSS_HOME/modules/system/layers/base/org/jsoup/main/jsoup-1.14.3.jar

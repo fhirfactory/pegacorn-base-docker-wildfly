@@ -18,6 +18,16 @@ batch
 #/subsystem=undertow/server=default-server/host=default-host/filter-ref=Content-Security-Policy/:add()
 /subsystem=undertow/server=default-server/host=default-host/filter-ref=x-frame-options/:add()
 /subsystem=undertow/server=default-server/host=default-host/filter-ref=strict-transport-security/:add()
+
+# Kerberos configuration
+/system-property=sun.security.krb5.debug:add(value=true)
+/system-property=java.security.krb5.realm:add(value=PEGACORN-FHIRPLACE-AUDIT.LOCAL)
+/system-property=java.security.krb5.kdc:add(value=pegacorn-fhirplace-kdcserver-0.pegacorn-fhirplace-kdcserver.site-a)
+/system-property=java.security.krb5.conf:add(value=/etc/krb5.conf)
+/core-service=management/security-realm=Kerberos:add
+/core-service=management/security-realm=Kerberos/server-identity=kerberos:add
+/core-service=management/security-realm=Kerberos/server-identity=kerberos/keytab=jboss@PEGACORN-FHIRPLACE-AUDIT.LOCAL:add(path=${env.KEYTAB_DIR}/hbase-krb5.keytab, debug=true)
+/core-service=management/security-realm=Kerberos/authentication=kerberos:add(remove-realm=true)
 			
 /core-service=management/security-realm=ApplicationRealm:remove()
 /core-service=management/security-realm=ApplicationRealm:add()
