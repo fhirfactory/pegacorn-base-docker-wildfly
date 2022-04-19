@@ -65,6 +65,8 @@ RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/santuario/xmlsec/main/x
 RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/thrift/main/libthrift-0.13.0.jar
 RUN rm $JBOSS_HOME/modules/system/layers/base/org/picketlink/common/main/picketlink-common-2.5.5.SP12-redhat-00009.jar
 RUN rm $JBOSS_HOME/modules/system/layers/base/org/jsoup/main/jsoup-1.8.3.jar
+RUN rm $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-core-1.5.0.jar
+RUN rm $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-thrift-1.5.0.jar
 
 # Copy jar versions that are not vulnerable as @ 14/04/2022
 COPY jar_files/jackson-databind-2.12.6.1.jar $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.6.1.jar
@@ -73,3 +75,5 @@ COPY jar_files/xmlsec-2.2.3.jar $JBOSS_HOME/modules/system/layers/base/org/apach
 COPY jar_files/libthrift-0.14.0.jar $JBOSS_HOME/modules/system/layers/base/org/apache/thrift/main/libthrift-0.14.0.jar
 COPY jar_files/picketlink-common-2.6.1.Final.jar $JBOSS_HOME/modules/system/layers/base/org/picketlink/common/main/picketlink-common-2.6.1.Final.jar
 COPY jar_files/jsoup-1.14.3.jar $JBOSS_HOME/modules/system/layers/base/org/jsoup/main/jsoup-1.14.3.jar
+COPY jar_files/jaeger-core-1.6.0.jar $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-core-1.6.0.jar
+COPY jar_files/jaeger-thrift-1.6.0.jar $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-thrift-1.6.0.jar
