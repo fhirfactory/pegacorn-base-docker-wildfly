@@ -6,8 +6,8 @@ ENV LANG C.UTF-8
 # START equivalent of https://github.com/jboss-dockerfiles/wildfly/blob/20.0.1.Final/Dockerfile
 
 # Set the WILDFLY_VERSION env variable
-ENV WILDFLY_VERSION 24.0.1.Final
-ENV WILDFLY_SHA1 751e3ff9128a6fbe72016552a9b864f729a710cc
+ENV WILDFLY_VERSION 26.0.1.Final
+ENV WILDFLY_SHA1 08908faf9ae99e5fb6374979afbffea461aadc2c
 ENV JBOSS_HOME=${HOME}/wildfly
 
 # Switch back to root
@@ -16,7 +16,7 @@ USER root
 # Add the WildFly distribution to /opt, and make wildfly the owner of the extracted tar content
 # Make sure the distribution is available from a well-known place
 RUN cd $HOME \
-    && wget -O wildfly-$WILDFLY_VERSION.tar.gz https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
+    && wget -O wildfly-$WILDFLY_VERSION.tar.gz https://github.com/wildfly/wildfly/releases/download/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
     && sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 \
     && tar xf wildfly-$WILDFLY_VERSION.tar.gz \
     && mv $HOME/wildfly-$WILDFLY_VERSION $JBOSS_HOME \
@@ -60,20 +60,6 @@ RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/ssl-configuration.cli &&
 # Remove vulnerable jars that exist only in Wildfly
 # These jars are not in the Aether projects
 RUN rm $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.3.jar
-RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/sshd/main/sshd-core-2.6.0.jar
-RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/santuario/xmlsec/main/xmlsec-2.1.6.jar
-RUN rm $JBOSS_HOME/modules/system/layers/base/org/apache/thrift/main/libthrift-0.13.0.jar
-RUN rm $JBOSS_HOME/modules/system/layers/base/org/picketlink/common/main/picketlink-common-2.5.5.SP12-redhat-00009.jar
-RUN rm $JBOSS_HOME/modules/system/layers/base/org/jsoup/main/jsoup-1.8.3.jar
-RUN rm $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-core-1.5.0.jar
-RUN rm $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-thrift-1.5.0.jar
 
 # Copy jar versions that are not vulnerable as @ 14/04/2022
 COPY jar_files/jackson-databind-2.12.6.1.jar $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.6.1.jar
-COPY jar_files/sshd-core-2.7.0.jar $JBOSS_HOME/modules/system/layers/base/org/apache/sshd/main/sshd-core-2.7.0.jar
-COPY jar_files/xmlsec-2.2.3.jar $JBOSS_HOME/modules/system/layers/base/org/apache/santuario/xmlsec/main/xmlsec-2.2.3.jar
-COPY jar_files/libthrift-0.14.0.jar $JBOSS_HOME/modules/system/layers/base/org/apache/thrift/main/libthrift-0.14.0.jar
-COPY jar_files/picketlink-common-2.6.1.Final.jar $JBOSS_HOME/modules/system/layers/base/org/picketlink/common/main/picketlink-common-2.6.1.Final.jar
-COPY jar_files/jsoup-1.14.3.jar $JBOSS_HOME/modules/system/layers/base/org/jsoup/main/jsoup-1.14.3.jar
-COPY jar_files/jaeger-core-1.6.0.jar $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-core-1.6.0.jar
-COPY jar_files/jaeger-thrift-1.6.0.jar $JBOSS_HOME/modules/system/layers/base/io/jaegertracing/jaeger/main/jaeger-thrift-1.6.0.jar

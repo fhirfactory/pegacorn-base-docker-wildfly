@@ -1,14 +1,15 @@
 # This script will configure the ssl and use the certificates in the keystore and truststore.
-# Without this a warning will be in the logs and a self signed certificate for localhost will be automatically generated. 
+# Without this a warning will be in the logs and a self signed certificate for localhost will be automatically generated.
+# Wildfly 26 - Ref: https://docs.wildfly.org/26/WildFly_Elytron_Security.html#enable-one-way-ssltls-for-applications 
 
 embed-server --server-config=standalone.xml
 batch
-/core-service=management/security-realm=UndertowRealm:add()
-/core-service=management/security-realm=UndertowRealm/server-identity=ssl:add(keystore-path=/var/lib/pegacorn-keystores/keystore.jks,keystore-password=${env.KEY_PASSWORD})
-/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=security-realm, value=UndertowRealm)
-/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=enabled-protocols, value="TLSv1.2,TLSv1.3")
-# https://scotthelme.co.uk/https-cheat-sheet/ has a good description of the cipher suites
-/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=enabled-cipher-suites, value="TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256")
+
+# Configure SSL/TLS
+# Remove applicationKS ssl context and related components - it is suitable for testing purposes only
+/subsystem=elytron/server-ssl-context=applicationSSC:remove()
+/subsystem=elytron/key-manager=applicationKM:remove()
+/subsystem=elytron/key-store=applicationKS:remove()
 
 # From https://stackoverflow.com/questions/56272061/configure-http-headers-in-wildfly-10
 # and https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html
@@ -18,17 +19,24 @@ batch
 #/subsystem=undertow/server=default-server/host=default-host/filter-ref=Content-Security-Policy/:add()
 /subsystem=undertow/server=default-server/host=default-host/filter-ref=x-frame-options/:add()
 /subsystem=undertow/server=default-server/host=default-host/filter-ref=strict-transport-security/:add()
-			
-/core-service=management/security-realm=ApplicationRealm:remove()
-/core-service=management/security-realm=ApplicationRealm:add()
-/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:add(keystore-path=/var/lib/pegacorn-keystores/keystore.jks,keystore-password=${env.KEY_PASSWORD})
 
-# From https://access.redhat.com/documentation/en-us/jboss_enterprise_application_platform/6.2/html/security_guide/configure_the_management_console_for_https_in_standalone_mode
+# Configure Keystore
+/subsystem=elytron/key-store=httpsKS:add(path=/var/lib/pegacorn-keystores/keystore.jks,credential-reference={clear-text=KEY_PASSWORD},type=JKS)
+# Configure a key-manager that references your key-store:
+/subsystem=elytron/key-manager=httpsKM:add(key-store=httpsKS,credential-reference={clear-text=KEY_PASSWORD})
+# Configure a server-ssl-context that references your key-manager:
+/subsystem=elytron/server-ssl-context=httpsSSC:add(key-manager=httpsKM,protocols=["TLSv1.2","TLSv1.3"],cipher-suite-filter="TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256")
+
+# Undertow cannot reference both a legacy security realm and an ssl-context in Elytron at the same time so you must remove the reference to the legacy security realm
+/subsystem=undertow/server=default-server/https-listener=https:undefine-attribute(name=security-realm)
+/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context,value=httpsSSC)
+
+# SSL/TLS for the Management Interfaces
+/core-service=management/management-interface=http-interface:write-attribute(name=ssl-context, value=httpsSSC)
 /core-service=management/management-interface=http-interface:write-attribute(name=secure-socket-binding, value=management-https)
-/core-service=management/management-interface=http-interface:undefine-attribute(name=socket-binding)
 
-# From https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.2/html-single/how_to_configure_server_security/index
-/core-service=management/security-realm=ManagementRealm/server-identity=ssl:add(keystore-path=/var/lib/pegacorn-keystores/keystore.jks,keystore-password=${env.KEY_PASSWORD},enabled-protocols=["TLSv1.2"],enabled-cipher-suites=["TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"])
+# Management interface to bind to https only - remove http socket bind
+/core-service=management/management-interface=http-interface:undefine-attribute(name=socket-binding)
 
 run-batch
 
