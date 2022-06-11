@@ -57,6 +57,9 @@ COPY cli/ssl-configuration.cli $JBOSS_HOME/bin/ssl-configuration.cli
 RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/ssl-configuration.cli && \
     rm -rf $JBOSS_HOME/standalone/configuration/standalone_xml_history/current/*
 
+# Update standalone.xml for keystore env variable
+RUN sed -i 's/KEY_PASSWORD/${env.KEY_PASSWORD}/g' $JBOSS_HOME/standalone/configuration/standalone.xml
+
 # Remove vulnerable jars that exist only in Wildfly
 # These jars are not in the Aether projects
 RUN rm $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.3.jar
