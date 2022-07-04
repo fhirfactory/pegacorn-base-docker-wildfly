@@ -6,8 +6,8 @@ ENV LANG C.UTF-8
 # START equivalent of https://github.com/jboss-dockerfiles/wildfly/blob/20.0.1.Final/Dockerfile
 
 # Set the WILDFLY_VERSION env variable
-ENV WILDFLY_VERSION 26.0.1.Final
-ENV WILDFLY_SHA1 08908faf9ae99e5fb6374979afbffea461aadc2c
+ENV WILDFLY_VERSION 26.1.1.Final
+ENV WILDFLY_SHA1 c11076dd0ea3bb554c5336eeafdfcee18d94551d
 ENV JBOSS_HOME=${HOME}/wildfly
 
 # Switch back to root
@@ -59,10 +59,3 @@ RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/ssl-configuration.cli &&
 
 # Update standalone.xml for keystore env variable
 RUN sed -i 's/KEY_PASSWORD/${env.KEY_PASSWORD}/g' $JBOSS_HOME/standalone/configuration/standalone.xml
-
-# Remove vulnerable jars that exist only in Wildfly
-# These jars are not in the Aether projects
-RUN rm $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.3.jar
-
-# Copy jar versions that are not vulnerable as @ 14/04/2022
-COPY jar_files/jackson-databind-2.12.6.1.jar $JBOSS_HOME/modules/system/layers/base/com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-2.12.6.1.jar
