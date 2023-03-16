@@ -13,10 +13,15 @@ ENV JBOSS_HOME=${HOME}/wildfly
 # Switch back to root
 USER root
 
+# Fix for wget: server returned error: HTTP/1.1 500 handshakefailed
+RUN apk --no-cache add ca-certificates wget \
+    && update-ca-certificates \
+    && rm -rf /var/cache/apk/*
+
 # Add the WildFly distribution to /opt, and make wildfly the owner of the extracted tar content
 # Make sure the distribution is available from a well-known place
 RUN cd $HOME \
-    && wget -O wildfly-$WILDFLY_VERSION.tar.gz https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
+    && wget --no-check-certificate -O wildfly-$WILDFLY_VERSION.tar.gz https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
     && sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 \
     && tar xf wildfly-$WILDFLY_VERSION.tar.gz \
     && mv $HOME/wildfly-$WILDFLY_VERSION $JBOSS_HOME \
